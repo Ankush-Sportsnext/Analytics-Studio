@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Analytics Studio business performance dashboard.">
+
+    <title>Analytics Studio | Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+<div class="app-shell">
+    <aside class="sidebar" aria-label="Primary navigation">
+        <a class="brand-mark" href="#" aria-label="Quixotic"><span>Q</span></a>
+        <nav>
+            <a class="side-link active" href="#" aria-label="Dashboard"><span>▦</span></a>
+            <a class="side-link" href="#transactions" aria-label="Payments"><span>▤</span></a>
+            <a class="side-link" href="#" aria-label="Wallet"><span>◫</span></a>
+            <a class="side-link" href="#" aria-label="Cards"><span>▱</span></a>
+            <a class="side-link" href="#" aria-label="Messages"><span>□</span></a>
+            <a class="side-link" href="#" aria-label="Contact"><span>♙</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a class="side-link" href="#" aria-label="Settings"><span>⚙</span></a>
+            <a class="side-link" href="#" aria-label="Log out"><span>↪</span></a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <a class="brand-name" href="#"><span class="brand-leaf">◉</span> Quixotic</a>
+            <nav class="top-nav" aria-label="Section navigation">
+                <a class="active" href="#">Dashboard</a>
+                <a href="#">Reports</a>
+                <a href="#">Documents</a>
+                <a href="#">History</a>
+                <a href="#">Contacts</a>
+            </nav>
+            <div class="top-actions">
+                <button aria-label="Search">⌕</button>
+                <button class="notification" aria-label="Notifications">♧</button>
+                <div class="profile-avatar">A</div>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <section class="welcome-row">
+                <h1>Welcome Back, <span>Ankush</span></h1>
+                <div class="welcome-actions">
+                    <button class="date-button"><span>▣</span> 29 Jun, 2025 - 29 August, 2025 <span>⌄</span></button>
+                    <button class="add-wallet">＋ <span>Add New Wallet</span></button>
+                </div>
+            </section>
+
+            <section class="dashboard-grid">
+                <article class="card credit-card">
+                    <div class="card-heading">
+                        <div><strong>Payment Goal</strong><small>Total amount goal</small></div>
+                        <span class="number-badge">2</span>
+                    </div>
+                    <div class="visa-card">
+                        <div class="visa-top"><strong>VISA</strong><span>◉)))</span></div>
+                        <small>Credit Card</small>
+                        <div class="card-balance">₹ <strong>78,989.09</strong></div>
+                        <div class="card-footer"><span>•••• 2020</span><span>EXP 09/28</span></div>
+                    </div>
+                    <div class="weekly-revenue">
+                        <div><small>Weekly Revenue</small><strong>+3,945 INR</strong></div>
+                        <span class="positive-pill">+12.8%</span>
+                    </div>
+                </article>
+
+                <article class="card engagement-card">
+                    <div class="card-heading">
+                        <div><strong>Engagement Ratio</strong></div>
+                        <div class="chart-controls"><button>Monthly</button><button class="active">Annually</button><span>↗</span></div>
+                    </div>
+                    <div class="bar-chart">
+                        <div class="bar-axis"><span>3k</span><span>2k</span><span>1k</span><span>0</span></div>
+                        <div class="bars">
+                            <div class="bar" style="--h:42%"><span>JAN</span></div>
+                            <div class="bar" style="--h:58%"><span>FEB</span></div>
+                            <div class="bar" style="--h:72%"><span>MAR</span></div>
+                            <div class="bar" style="--h:88%"><span>APR</span></div>
+                            <div class="bar" style="--h:64%"><span>MAY</span></div>
+                            <div class="bar" style="--h:76%"><span>JUN</span></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card summary-card">
+                    <div class="card-heading">
+                        <div><strong>Payment Goal</strong><small>Total amount goal</small></div>
+                        <span class="number-badge">2</span>
+                    </div>
+                    <div class="goal-summary">
+                        <small>Total Balance</small>
+                        <strong>₹32,678.90</strong>
+                        <svg viewBox="0 0 300 90" aria-label="Balance trend">
+                            <defs><linearGradient id="lineFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8ddcf" stop-opacity=".75"/><stop offset="1" stop-color="#b8ddcf" stop-opacity=".05"/></linearGradient></defs>
+                            <path d="M0 68 C18 72 18 54 38 58 S60 48 72 56 S92 28 112 40 S138 72 158 64 S188 22 208 40 S236 72 256 58 S278 30 300 34 L300 90 L0 90 Z" fill="url(#lineFill)"/>
+                            <path d="M0 68 C18 72 18 54 38 58 S60 48 72 56 S92 28 112 40 S138 72 158 64 S188 22 208 40 S236 72 256 58 S278 30 300 34" fill="none" stroke="#5f9f8b" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="summary-actions"><button class="send">Send <span>↑</span></button><button>Receive <span>↓</span></button></div>
+                    <div class="mini-stat">
+                        <div class="mini-icon">▣</div>
+                        <div><strong>Amount of credit</strong><small>Total refund amount with fee</small></div>
+                    </div>
+                    <div class="credit-amount"><strong>₹8,945.89</strong><span>+12.8%</span></div>
+                    <div class="payments-mini">
+                        <strong>Mandatory Payments</strong><small>Recent payment</small>
+                        <div class="people"><span>AM</span><span>SW</span><span>JL</span><span>RK</span><b>+2</b></div>
+                    </div>
+                </article>
+
+                <article class="card table-card" id="transactions">
+                    <div class="table-header">
+                        <div><strong>Payment History</strong><small>Recent payments history</small></div>
+                        <span class="number-badge">↗</span>
+                    </div>
+                    <div class="table-controls">
+                        <input type="search" id="searchInput" placeholder="Search customer or ID" aria-label="Search transactions">
+                        <select id="statusFilter" aria-label="Filter status">
+                            <option value="all">All statuses</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div class="table-container" id="tableContainer">
+                        <table>
+                            <thead><tr><th>Name</th><th>Date</th><th>Time</th><th>Status</th><th>Amount</th></tr></thead>
+                            <tbody id="transactionBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state" id="emptyState" hidden><h3>No transactions found</h3><button id="resetFilters" class="primary-button">Clear filters</button></div>
+                    <div class="error-state" id="errorState" hidden><h3>Unable to load transactions</h3><button id="retryButton" class="primary-button">Try again</button></div>
+                    <div class="skeleton-state" id="skeletonState" hidden><div class="skeleton-row"><span></span><span></span><span></span></div></div>
+                    <div class="table-footer" id="tableFooter"><span id="resultCount"></span></div>
+                    <select id="stateSelector" class="sr-only" aria-hidden="true"><option value="ideal">Ideal</option><option value="empty">Empty</option><option value="skeleton">Skeleton</option><option value="error">Error</option></select>
+                </article>
+            </section>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>
