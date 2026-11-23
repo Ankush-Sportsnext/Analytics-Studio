@@ -1,12 +1,13 @@
-
-/* =========================================
+/* ==========================================
    ANALYTICS STUDIO
-   Interactive Functionality
-========================================= */
+   Task 05 - Interactive Dashboard
+   HTML + CSS + JavaScript + LocalStorage
+========================================== */
 
-// 1. SAMPLE TRANSACTION DATA
+const STORAGE_KEY = "analytics_dashboard_data";
+const SETTINGS_KEY = "analytics_dashboard_settings";
 
-const transactions = [
+const defaultTransactions = [
     {
         id: "TXN-2026-001",
         name: "Olivia Martin",
@@ -63,306 +64,318 @@ const transactions = [
     }
 ];
 
+const elements = {
+    body: document.getElementById("transactionBody"),
+    search: document.getElementById("searchInput"),
+    filter: document.getElementById("statusFilter"),
+    empty: document.getElementById("emptyState"),
+    error: document.getElementById("errorState"),
+    loading: document.getElementById("skeletonState"),
+    table: document.getElementById("tableContainer"),
+    footer: document.getElementById("tableFooter"),
+    count: document.getElementById("resultCount"),
+    reset: document.getElementById("resetFilters"),
+    retry: document.getElementById("retryButton"),
+    selector: document.getElementById("stateSelector"),
+    add: document.getElementById("addTransactionBtn")
+};
 
-// 2. DOM ELEMENTS
+function loadTransactions() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+        }
+    } catch (error) {
+        console.error("Could not read saved transactions:", error);
+    }
 
-const transactionBody = document.getElementById("transactionBody");
+    return [...defaultTransactions];
+}
 
-const searchInput = document.getElementById("searchInput");
+function saveTransactions() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+    } catch (error) {
+        console.error("Could not save transactions:", error);
+    }
+}
 
-const statusFilter = document.getElementById("statusFilter");
+function loadSettings() {
+    try {
+        return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+    } catch (error) {
+        console.error("Could not read saved dashboard settings:", error);
+        return {};
+    }
+}
 
-const emptyState = document.getElementById("emptyState");
+function saveSettings() {
+    const settings = {
+        state: currentState,
+        search: elements.search.value,
+        filter: elements.filter.value
+    };
 
-const errorState = document.getElementById("errorState");
+    try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    } catch (error) {
+        console.error("Could not save dashboard settings:", error);
+    }
+}
 
-const skeletonState = document.getElementById("skeletonState");
-
-const tableContainer = document.getElementById("tableContainer");
-
-const tableFooter = document.getElementById("tableFooter");
-
-const resultCount = document.getElementById("resultCount");
-
-const resetFilters = document.getElementById("resetFilters");
-
-const retryButton = document.getElementById("retryButton");
-
-const stateSelector = document.getElementById("stateSelector");
-
-
-// 3. FORMAT CURRENCY
+let transactions = loadTransactions();
+const savedSettings = loadSettings();
+let currentState = "ideal";
 
 function formatCurrency(amount) {
-
     return new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
         maximumFractionDigits: 0
     }).format(amount);
-
 }
-
-
-// 4. DISPLAY TRANSACTION ROWS
 
 function renderTransactions(data) {
-
-    transactionBody.innerHTML = "";
+    elements.body.replaceChildren();
 
     data.forEach(transaction => {
-
         const row = document.createElement("tr");
 
-        row.innerHTML = `
-            <td>
-                <div class="customer-cell">
-                    <div class="customer-avatar">
-                        ${transaction.initials}
-                    </div>
+        const idCell = document.createElement("td");
+        const id = document.createElement("span");
+        id.className = "transaction-id";
+        id.textContent = transaction.id;
+        idCell.appendChild(id);
 
-                    <span class="customer-name" title="${transaction.name}">
-                        ${transaction.name}
-                    </span>
-                </div>
-            </td>
-            <td>${transaction.date}</td>
-            <td>10:30 PM</td>
-            <td>
-                <span class="status ${transaction.status}">
-                    ${transaction.status.charAt(0).toUpperCase() +
-                    transaction.status.slice(1)}
-                </span>
-            </td>
-            <td>
-                <span class="amount">
-                    ${formatCurrency(transaction.amount)}
-                </span>
-            </td>
-        `;
+        const customerCell = document.createElement("td");
+        const customerWrapper = document.createElement("div");
+        const avatar = document.createElement("div");
+        const customerName = document.createElement("span");
+        customerWrapper.className = "customer-cell";
+        avatar.className = "customer-avatar";
+        customerName.className = "customer-name";
+        avatar.textContent = transaction.initials;
+        customerName.textContent = transaction.name;
+        customerWrapper.append(avatar, customerName);
+        customerCell.appendChild(customerWrapper);
 
-        transactionBody.appendChild(row);
+        const productCell = document.createElement("td");
+        const product = document.createElement("span");
+        product.className = "product-name";
+        product.textContent = transaction.product;
+        productCell.appendChild(product);
 
+        const dateCell = document.createElement("td");
+        dateCell.textContent = transaction.date;
+
+        const amountCell = document.createElement("td");
+        const amount = document.createElement("span");
+        amount.className = "amount";
+        amount.textContent = formatCurrency(transaction.amount);
+        amountCell.appendChild(amount);
+
+        const statusCell = document.createElement("td");
+        const status = document.createElement("span");
+        status.className = `status ${transaction.status}`;
+        status.textContent =
+            transaction.status.charAt(0).toUpperCase() +
+            transaction.status.slice(1);
+        statusCell.appendChild(status);
+
+        row.append(
+            idCell,
+            customerCell,
+            productCell,
+            dateCell,
+            amountCell,
+            statusCell
+        );
+        elements.body.appendChild(row);
     });
-
 }
 
-
-// 5. SEARCH AND FILTER FUNCTIONALITY
+function hideAllStates() {
+    elements.empty.hidden = true;
+    elements.error.hidden = true;
+    elements.loading.hidden = true;
+    elements.table.hidden = false;
+    elements.footer.hidden = false;
+}
 
 function filterTransactions() {
-
-    const searchTerm = searchInput.value.toLowerCase().trim();
-
-    const selectedStatus = statusFilter.value;
-
-    const filteredData = transactions.filter(transaction => {
-
+    const query = elements.search.value.toLowerCase().trim();
+    const selectedStatus = elements.filter.value;
+    const filtered = transactions.filter(transaction => {
         const matchesSearch =
-            transaction.name.toLowerCase().includes(searchTerm) ||
-            transaction.id.toLowerCase().includes(searchTerm);
-
+            transaction.name.toLowerCase().includes(query) ||
+            transaction.id.toLowerCase().includes(query) ||
+            transaction.product.toLowerCase().includes(query);
         const matchesStatus =
             selectedStatus === "all" ||
             transaction.status === selectedStatus;
 
         return matchesSearch && matchesStatus;
-
     });
 
-    renderTransactions(filteredData);
+    hideAllStates();
 
-    // Show empty state when no matching records exist
-
-    const hasResults = filteredData.length > 0;
-
-    tableContainer.hidden = !hasResults;
-
-    emptyState.hidden = hasResults;
-
-    errorState.hidden = true;
-
-    skeletonState.hidden = true;
-
-    tableFooter.hidden = !hasResults;
-
-    // Update result count
-
-    if (hasResults) {
-
-        resultCount.textContent =
-            `Showing 1–${filteredData.length} of ${filteredData.length} transactions`;
-
+    if (filtered.length === 0) {
+        elements.table.hidden = true;
+        elements.footer.hidden = true;
+        elements.empty.hidden = false;
+        currentState = "empty";
+    } else {
+        renderTransactions(filtered);
+        elements.count.textContent =
+            `Showing ${filtered.length} of ${transactions.length} transactions`;
+        currentState = "ideal";
     }
 
+    elements.selector.value = currentState;
+    saveSettings();
 }
 
+function showEmptyState() {
+    hideAllStates();
+    elements.table.hidden = true;
+    elements.footer.hidden = true;
+    elements.empty.hidden = false;
+    currentState = "empty";
+    saveSettings();
+}
 
-// 6. SEARCH EVENT
+function showLoadingState() {
+    hideAllStates();
+    elements.table.hidden = true;
+    elements.footer.hidden = true;
+    elements.loading.hidden = false;
+    currentState = "loading";
+    saveSettings();
+}
 
-searchInput.addEventListener("input", () => {
+function showErrorState() {
+    hideAllStates();
+    elements.table.hidden = true;
+    elements.footer.hidden = true;
+    elements.error.hidden = false;
+    currentState = "error";
+    saveSettings();
+}
 
-    stateSelector.value = "ideal";
+function showOverflowState() {
+    const overflowTransaction = {
+        id: "TXN-2026-999",
+        name: "Alexander Christopher Montgomery",
+        initials: "AM",
+        product: "Enterprise Business Membership and Premium Analytics Package",
+        date: "23 Nov 2026",
+        amount: 12500000,
+        status: "completed"
+    };
 
-    filterTransactions();
-
-});
-
-
-// 7. STATUS FILTER EVENT
-
-statusFilter.addEventListener("change", () => {
-
-    stateSelector.value = "ideal";
-
-    filterTransactions();
-
-});
-
-
-// 8. RESET FILTERS
-
-resetFilters.addEventListener("click", () => {
-
-    searchInput.value = "";
-
-    statusFilter.value = "all";
-
-    stateSelector.value = "ideal";
-
-    showState("ideal");
-
-});
-
-
-// 9. FIVE UI STATES
+    hideAllStates();
+    renderTransactions([...transactions, overflowTransaction]);
+    elements.count.textContent = `Showing ${transactions.length + 1} transactions`;
+    currentState = "overflow";
+    saveSettings();
+}
 
 function showState(state) {
-
-    // Hide all special states first
-
-    emptyState.hidden = true;
-
-    errorState.hidden = true;
-
-    skeletonState.hidden = true;
-
-    tableContainer.hidden = false;
-
-    tableFooter.hidden = false;
-
-    // IDEAL STATE
+    if (!["ideal", "empty", "loading", "error", "overflow"].includes(state)) {
+        state = "ideal";
+    }
 
     if (state === "ideal") {
+        filterTransactions();
+    } else if (state === "empty") {
+        showEmptyState();
+    } else {
+        elements.search.value = "";
+        elements.filter.value = "all";
 
-        renderTransactions(transactions);
-
-        tableContainer.hidden = false;
-
-        tableFooter.hidden = false;
-
-        resultCount.textContent =
-            `Showing 1–${transactions.length} of ${transactions.length} transactions`;
-
+        if (state === "loading") {
+            showLoadingState();
+        } else if (state === "error") {
+            showErrorState();
+        } else {
+            showOverflowState();
+        }
     }
 
-
-    // EMPTY STATE
-
-    else if (state === "empty") {
-
-        transactionBody.innerHTML = "";
-
-        tableContainer.hidden = true;
-
-        tableFooter.hidden = true;
-
-        emptyState.hidden = false;
-
-    }
-
-
-    // SKELETON LOADING STATE
-
-    else if (state === "skeleton") {
-
-        tableContainer.hidden = true;
-
-        tableFooter.hidden = true;
-
-        skeletonState.hidden = false;
-
-    }
-
-
-    // ERROR STATE
-
-    else if (state === "error") {
-
-        tableContainer.hidden = true;
-
-        tableFooter.hidden = true;
-
-        errorState.hidden = false;
-
-    }
-
-
-    // OVERFLOW STATE
-
-    else if (state === "overflow") {
-
-        const overflowData = [
-            {
-                id: "TXN-2026-999",
-                name: "Alexander Christopher Montgomery",
-                initials: "AM",
-                product: "Enterprise Business Membership and Premium Analytics Package",
-                date: "23 Nov 2026",
-                amount: 12500000,
-                status: "completed"
-            },
-            ...transactions.slice(0, 3)
-        ];
-
-        renderTransactions(overflowData);
-
-        tableContainer.hidden = false;
-
-        tableFooter.hidden = false;
-
-        resultCount.textContent =
-            "Showing 1–4 of 4 transactions";
-
-    }
-
+    elements.selector.value = currentState;
 }
 
+elements.search.addEventListener("input", filterTransactions);
+elements.filter.addEventListener("change", filterTransactions);
 
-// 10. STATE PREVIEW CONTROL
-
-stateSelector.addEventListener("change", () => {
-
-    searchInput.value = "";
-
-    statusFilter.value = "all";
-
-    showState(stateSelector.value);
-
-});
-
-
-// 11. RETRY ACTION
-
-retryButton.addEventListener("click", () => {
-
-    stateSelector.value = "ideal";
-
+elements.reset.addEventListener("click", () => {
+    elements.search.value = "";
+    elements.filter.value = "all";
     showState("ideal");
-
 });
 
+elements.retry.addEventListener("click", () => {
+    elements.retry.disabled = true;
+    showLoadingState();
 
-// 12. INITIAL DASHBOARD RENDER
+    setTimeout(() => {
+        elements.retry.disabled = false;
+        showState("ideal");
+    }, 1200);
+});
 
-showState("ideal");
+elements.add.addEventListener("click", () => {
+    const nextNumber = transactions.reduce((highest, transaction) => {
+        const match = /^TXN-\d{4}-(\d+)$/.exec(transaction.id);
+        return match ? Math.max(highest, Number(match[1])) : highest;
+    }, 0) + 1;
+
+    transactions.unshift({
+        id: `TXN-2026-${String(nextNumber).padStart(3, "0")}`,
+        name: "New Customer",
+        initials: "NC",
+        product: "Premium Membership",
+        date: new Date().toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }),
+        amount: 24500,
+        status: "completed"
+    });
+
+    saveTransactions();
+    elements.search.value = "";
+    elements.filter.value = "all";
+    showState("ideal");
+});
+
+elements.selector.addEventListener("change", () => {
+    showState(elements.selector.value);
+});
+
+function initializeDashboard() {
+    elements.search.value =
+        typeof savedSettings.search === "string" ? savedSettings.search : "";
+    elements.filter.value =
+        ["all", "completed", "pending", "failed"].includes(savedSettings.filter)
+            ? savedSettings.filter
+            : "all";
+
+    const validStates = ["ideal", "empty", "loading", "error", "overflow"];
+    currentState = validStates.includes(savedSettings.state)
+        ? savedSettings.state
+        : "ideal";
+
+    if (currentState === "loading") {
+        currentState = "ideal";
+    }
+
+    showState(currentState);
+}
+
+initializeDashboard();

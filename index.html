@@ -128,6 +128,19 @@
                         <div><strong>Payment History</strong><small>Recent payments history</small></div>
                         <span class="number-badge">↗</span>
                     </div>
+                    <section class="state-preview">
+                        <div>
+                            <strong>UI State Testing</strong>
+                            <p>Preview all five required interface states.</p>
+                        </div>
+                        <select id="stateSelector" aria-label="Select dashboard UI state">
+                            <option value="ideal">01 — Ideal State</option>
+                            <option value="empty">02 — Empty State</option>
+                            <option value="loading">03 — Loading State</option>
+                            <option value="error">04 — Error State</option>
+                            <option value="overflow">05 — Overflow State</option>
+                        </select>
+                    </section>
                     <div class="table-controls">
                         <input type="search" id="searchInput" placeholder="Search customer or ID" aria-label="Search transactions">
                         <select id="statusFilter" aria-label="Filter status">
@@ -136,10 +149,11 @@
                             <option value="pending">Pending</option>
                             <option value="failed">Failed</option>
                         </select>
+                        <button class="primary-button" id="addTransactionBtn" type="button">+ Add Transaction</button>
                     </div>
                     <div class="table-container" id="tableContainer">
                         <table>
-                            <thead><tr><th>Name</th><th>Date</th><th>Time</th><th>Status</th><th>Amount</th></tr></thead>
+                            <thead><tr><th>ID</th><th>Customer</th><th>Product</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
                             <tbody id="transactionBody"></tbody>
                         </table>
                     </div>
@@ -147,7 +161,6 @@
                     <div class="error-state" id="errorState" hidden><h3>Unable to load transactions</h3><button id="retryButton" class="primary-button">Try again</button></div>
                     <div class="skeleton-state" id="skeletonState" hidden><div class="skeleton-row"><span></span><span></span><span></span></div></div>
                     <div class="table-footer" id="tableFooter"><span id="resultCount"></span></div>
-                    <select id="stateSelector" class="sr-only" aria-hidden="true"><option value="ideal">Ideal</option><option value="empty">Empty</option><option value="skeleton">Skeleton</option><option value="error">Error</option></select>
                 </article>
             </section>
         </div>
